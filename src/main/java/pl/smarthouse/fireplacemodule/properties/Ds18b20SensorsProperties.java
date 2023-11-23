@@ -10,7 +10,7 @@ public class Ds18b20SensorsProperties {
   public static final String THERMOMETERS_WATER_OUT = "40-2-0-7-141-53-1-8"; // DS18b20 - 112
   public static final float THERMOMETERS_WATER_OUT_GRADIENT = 1f;
   public static final float THERMOMETERS_WATER_OUT_INTERCEPT = 0f;
-  public static final String THERMOMETERS_CHIMNEY = "40-2-0-7-141-53-1-8"; // DS18b20 - 112
+  public static final String THERMOMETERS_CHIMNEY = "40-2-0-7-141-53-1-9"; // DS18b20 - 112
   public static final float THERMOMETERS_CHIMNEY_GRADIENT = 1f;
   public static final float THERMOMETERS_CHIMNEY_INTERCEPT = 0f;
 }

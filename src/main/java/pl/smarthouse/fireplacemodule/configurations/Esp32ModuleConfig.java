@@ -3,6 +3,7 @@ package pl.smarthouse.fireplacemodule.configurations;
 import static pl.smarthouse.fireplacemodule.properties.Ds18b20SensorsProperties.*;
 import static pl.smarthouse.fireplacemodule.properties.Esp32ModuleProperties.*;
 import static pl.smarthouse.fireplacemodule.properties.PumpProperties.*;
+import static pl.smarthouse.fireplacemodule.properties.ThrottleProperties.*;
 
 import javax.annotation.PostConstruct;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20CompFactor;
 import pl.smarthouse.smartmodule.model.actors.type.pin.Pin;
 import pl.smarthouse.smartmodule.model.actors.type.pin.PinMode;
+import pl.smarthouse.smartmodule.model.actors.type.pwm.Pwm;
 import pl.smarthouse.smartmodule.services.ManagerService;
 import pl.smarthouse.smartmodule.services.ModuleService;
 
@@ -68,6 +70,16 @@ public class Esp32ModuleConfig {
     // Circuit pump
     actorMap.putActor(
         new Pin(PUMP, PUMP_PIN, PinMode.OUTPUT, PUMP_DEFAULT_STATE, PUMP_DEFAULT_ENABLED));
+    // Throttle
+    actorMap.putActor(
+        new Pwm(
+            THROTTLE,
+            THROTTLE_CHANNEL,
+            THROTTLE_FREQUENCY,
+            THROTTLE_RESOLUTION,
+            THROTTLE_PIN,
+            THROTTLE_DEFAULT_DUTY_CYCLE,
+            THROTTLE_DEFAULT_ENABLED));
     return actorMap;
   }
 }
