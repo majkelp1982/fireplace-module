@@ -6,7 +6,6 @@ import static pl.smarthouse.fireplacemodule.properties.Ds18b20SensorsProperties.
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.fireplacemodule.configurations.Esp32ModuleConfig;
-import pl.smarthouse.fireplacemodule.model.dao.FireplaceModuleDao;
 import pl.smarthouse.fireplacemodule.service.FireplaceModuleService;
 import pl.smarthouse.smartchain.model.core.Chain;
 import pl.smarthouse.smartchain.model.core.Step;
@@ -78,12 +77,11 @@ public class Ds18b20Chain {
   private Runnable createActionStep2() {
 
     return () -> {
-      final FireplaceModuleDao firewallModuleDao = fireplaceModuleService.getFirewallModuleDao();
-      firewallModuleDao.setWaterIn(
+      fireplaceModuleService.setWaterIn(
           thermometers.getResponse().getSensorResult(THERMOMETER_WATER_IN));
-      firewallModuleDao.setWaterOut(
+      fireplaceModuleService.setWaterOut(
           thermometers.getResponse().getSensorResult(THERMOMETERS_WATER_OUT));
-      firewallModuleDao.setChimney(
+      fireplaceModuleService.setChimney(
           thermometers.getResponse().getSensorResult(THERMOMETERS_CHIMNEY));
       thermometers.getCommandSet().setCommandType(Ds18b20CommandType.NO_ACTION);
     };

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.fireplacemodule.configurations.FireplaceModuleConfiguration;
-import pl.smarthouse.fireplacemodule.model.dao.FireplaceModuleDao;
 import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleDto;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Result;
 
@@ -19,8 +18,20 @@ public class FireplaceModuleService {
         fireplaceModuleConfiguration.getFireplaceModuleDao(), FireplaceModuleDto.class);
   }
 
-  public FireplaceModuleDao getFirewallModuleDao() {
-    return fireplaceModuleConfiguration.getFireplaceModuleDao();
+  public void setWaterIn(final Ds18b20Result ds18b20Result) {
+    fireplaceModuleConfiguration.getFireplaceModuleDao().setWaterIn(ds18b20Result);
+  }
+
+  public void setWaterOut(final Ds18b20Result ds18b20Result) {
+    fireplaceModuleConfiguration.getFireplaceModuleDao().setWaterOut(ds18b20Result);
+  }
+
+  public void setChimney(final Ds18b20Result ds18b20Result) {
+    fireplaceModuleConfiguration.getFireplaceModuleDao().setChimney(ds18b20Result);
+  }
+
+  public String getModuleName() {
+    return fireplaceModuleConfiguration.getFireplaceModuleDao().getModuleName();
   }
 
   public Ds18b20Result getWaterInSensor() {
