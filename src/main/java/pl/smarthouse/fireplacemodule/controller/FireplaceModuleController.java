@@ -7,6 +7,7 @@ import pl.smarthouse.fireplacemodule.service.FireplaceModuleParamsService;
 import pl.smarthouse.fireplacemodule.service.FireplaceModuleService;
 import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleDto;
 import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleParamsDto;
+import pl.smarthouse.sharedobjects.dto.fireplace.enums.State;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -21,6 +22,11 @@ public class FireplaceModuleController {
     return Mono.just(fireplaceModuleService.getFireplaceModule());
   }
 
+  @PatchMapping("/fireplace/state/toggle")
+  public Mono<State> stateToggle() {
+    return Mono.just(fireplaceModuleService.stateToggle());
+  }
+
   @PostMapping("/params")
   public Mono<FireplaceModuleParamsDto> saveParams(
       @RequestBody final FireplaceModuleParamsDto fireplaceModuleParamsDto) {
@@ -29,7 +35,7 @@ public class FireplaceModuleController {
 
   @GetMapping("/params")
   public Mono<FireplaceModuleParamsDto> getParams() {
-    return fireplaceModuleParamsService.getParams();
+    return Mono.just(fireplaceModuleParamsService.getParams());
   }
 
   @ExceptionHandler(Exception.class)

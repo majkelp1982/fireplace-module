@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import pl.smarthouse.fireplacemodule.model.dao.FireplaceModuleDao;
 import pl.smarthouse.fireplacemodule.properties.Esp32ModuleProperties;
 import pl.smarthouse.sharedobjects.dto.fireplace.core.Throttle;
+import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
 import pl.smarthouse.sharedobjects.dto.fireplace.enums.State;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Result;
 import pl.smarthouse.smartmonitoring.model.BooleanCompareProperties;
@@ -36,6 +37,8 @@ public class FireplaceModuleConfiguration {
     fireplaceModuleDao =
         FireplaceModuleDao.builder()
             .moduleName(Esp32ModuleProperties.MODULE_TYPE)
+            .mode(Mode.STANDBY)
+            .state(State.OFF)
             .waterIn(new Ds18b20Result())
             .waterOut(new Ds18b20Result())
             .chimney(new Ds18b20Result())
@@ -55,11 +58,12 @@ public class FireplaceModuleConfiguration {
     Ds18b20DefaultProperties.setDefaultProperties(compareProcessor, "chimney");
     compareProcessor.addMap("mode", EnumCompareProperties.builder().saveEnabled(true).build());
     compareProcessor.addMap("pump", EnumCompareProperties.builder().saveEnabled(true).build());
+    compareProcessor.addMap("state", EnumCompareProperties.builder().saveEnabled(true).build());
     compareProcessor.addMap(
         "throttle.currentPosition",
         NumberCompareProperties.builder().saveTolerance(1).saveEnabled(true).build());
     compareProcessor.addMap(
         "throttle.goalPosition",
-        EnumCompareProperties.builder().saveTolerance(1).saveEnabled(true).build());
+        NumberCompareProperties.builder().saveTolerance(1).saveEnabled(true).build());
   }
 }

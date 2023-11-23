@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.fireplacemodule.model.dao.FireplaceModuleParamsDao;
 import pl.smarthouse.fireplacemodule.repository.ParamsRepository;
@@ -17,6 +18,7 @@ public class FireplaceModuleParamsService {
   private final ParamsRepository paramsRepository;
   private final FireplaceModuleService fireplaceModuleService;
   private final ModelMapper modelMapper = new ModelMapper();
+  private FireplaceModuleParamsDto fireplaceModuleParamsDto;
 
   public Mono<FireplaceModuleParamsDto> saveParams(
       final FireplaceModuleParamsDto fireplaceModuleParamsDto) {
@@ -34,8 +36,17 @@ public class FireplaceModuleParamsService {
         .map(moduleName -> moduleName.toLowerCase() + "_settings");
   }
 
-  public Mono<FireplaceModuleParamsDto> getParams() {
-    return getParamTableName()
+  public FireplaceModuleParamsDto getParams() {
+    if (fireplaceModuleParamsDto == null) {
+      refreshParams();
+    }
+    while (fireplaceModuleParamsDto == null) {}
+    return fireplaceModuleParamsDto;
+  }
+
+  @Scheduled(initialDelay = 5000, fixedDelay = 60 * 1000)
+  private void refreshParams() {
+    getParamTableName()
         .flatMap(
             paramTableName ->
                 paramsRepository
@@ -45,8 +56,9 @@ public class FireplaceModuleParamsService {
                             log.debug("Successfully retrieve params: {}", fireplaceModuleParamsDao))
                     .map(
                         fireplaceModuleParamsDao ->
-                            modelMapper.map(
-                                fireplaceModuleParamsDao, FireplaceModuleParamsDto.class))
+                            fireplaceModuleParamsDto =
+                                modelMapper.map(
+                                    fireplaceModuleParamsDao, FireplaceModuleParamsDto.class))
                     .onErrorResume(
                         NoSuchElementException.class,
                         throwable -> {
@@ -61,6 +73,7 @@ public class FireplaceModuleParamsService {
                                 throwable))
                     .doOnSubscribe(
                         subscription ->
-                            log.debug("Get module params from collection: {}", paramTableName)));
+                            log.debug("Get module params from collection: {}", paramTableName)))
+        .subscribe();
   }
 }

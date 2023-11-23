@@ -33,7 +33,7 @@ public class Ds18b20Chain {
 
   private Chain createChain() {
     final Chain chain = new Chain("Read DS18B20 sensors");
-    // Wait 10 seconds and read values from each sensor type DS18B20
+    // Wait 30 seconds and read values from each sensor type DS18B20
     chain.addStep(createStep1());
     // Wait until command read successful and set command to NO_ACTION for all
     chain.addStep(createStep2());

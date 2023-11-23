@@ -8,4 +8,7 @@ public class ThrottleProperties {
   public static final int THROTTLE_PIN = 2;
   public static final int THROTTLE_DEFAULT_DUTY_CYCLE = 255;
   public static final boolean THROTTLE_DEFAULT_ENABLED = true;
+
+  public static final int THROTTLE_DUTY_CYCLE_0 = 0;
+  public static final int THROTTLE_DUTY_CYCLE_100 = 160;
 }

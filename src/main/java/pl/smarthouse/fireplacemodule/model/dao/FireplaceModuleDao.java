@@ -12,6 +12,7 @@ import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Result;
 @SuperBuilder
 public class FireplaceModuleDao extends ModuleDao {
   private Mode mode;
+  private State state;
   private Ds18b20Result waterIn;
   private Ds18b20Result waterOut;
   private Ds18b20Result chimney;
