@@ -13,7 +13,7 @@ public class ModeHandlerService {
   private final FireplaceModuleService fireplaceModuleService;
   private final FireplaceModuleParamsService fireplaceModuleParamsService;
 
-  @Scheduled(fixedDelay = 10000)
+  @Scheduled(fixedDelay = 1000)
   public void handleMode() {
     if (fireplaceModuleService.getWaterInSensor().isError()
         || fireplaceModuleService.getWaterOutSensor().isError()) {
@@ -44,12 +44,10 @@ public class ModeHandlerService {
   }
 
   private void setModeWhenFireplaceIsOff() {
-    final double absDeltaTemp =
-        Math.abs(
-            fireplaceModuleService.getWaterInSensor().getTemp()
-                - fireplaceModuleService.getWaterOutSensor().getTemp());
-
-    if (absDeltaTemp > 1.0) {
+    final double deltaTemp =
+        fireplaceModuleService.getWaterOutSensor().getTemp()
+            - fireplaceModuleService.getWaterInSensor().getTemp();
+    if (deltaTemp > 1.0) {
       fireplaceModuleService.setMode(Mode.COOLING);
     } else {
       fireplaceModuleService.setMode(Mode.OFF);

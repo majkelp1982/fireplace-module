@@ -32,8 +32,7 @@ public class FireplaceModuleService {
         State.ON.equals(fireplaceModuleConfiguration.getFireplaceModuleDao().getState())
             ? State.OFF
             : State.ON);
-    final State currentState = fireplaceModuleConfiguration.getFireplaceModuleDao().getState();
-    if (State.ON.equals(currentState)) {
+    if (isOn()) {
       fireplaceModuleDao.getThrottle().setGoalPosition(THROTTLE_GOAL_POSITION_FULL_OPEN);
     } else {
       fireplaceModuleDao.getThrottle().setGoalPosition(THROTTLE_GOAL_POSITION_CLOSED);
@@ -83,6 +82,10 @@ public class FireplaceModuleService {
 
   public boolean isOn() {
     return getState().equals(State.ON);
+  }
+
+  public boolean isPumpRequired() {
+    return !Mode.OFF.equals(fireplaceModuleConfiguration.getFireplaceModuleDao().getMode());
   }
 
   public Throttle getThrottle() {

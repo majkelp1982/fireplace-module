@@ -32,7 +32,7 @@ public class PumpChain {
 
   private Chain createChain() {
     final Chain chain = new Chain("Circuit pump");
-    // Wait 10 seconds and set correct default state
+    // Wait 10 seconds and set correct default state by mode
     chain.addStep(createStep1());
     // Wait until correct default state and set pump accordingly
     chain.addStep(createStep2());
@@ -44,7 +44,7 @@ public class PumpChain {
   private Step createStep1() {
 
     return Step.builder()
-        .stepDescription("Set correct default state")
+        .stepDescription("Set correct default state by mode")
         .conditionDescription("Waiting 10 seconds")
         .condition(PredicateUtils.delaySeconds(10))
         .action(createActionStep1())
@@ -56,7 +56,11 @@ public class PumpChain {
     return () -> {
       if (!isCorrectDefaultState()) {
         pump.getCommandSet().setCommandType(PinCommandType.SET_DEFAULT_STATE);
-        pump.getCommandSet().setValue(isOn() ? PinState.LOW.toString() : PinState.HIGH.toString());
+        pump.getCommandSet()
+            .setValue(
+                fireplaceModuleService.isPumpRequired()
+                    ? PinState.LOW.toString()
+                    : PinState.HIGH.toString());
       }
     };
   }
@@ -75,7 +79,11 @@ public class PumpChain {
 
     return () -> {
       pump.getCommandSet().setCommandType(PinCommandType.SET);
-      pump.getCommandSet().setValue(isOn() ? PinState.LOW.toString() : PinState.HIGH.toString());
+      pump.getCommandSet()
+          .setValue(
+              fireplaceModuleService.isPumpRequired()
+                  ? PinState.LOW.toString()
+                  : PinState.HIGH.toString());
     };
   }
 
@@ -96,13 +104,11 @@ public class PumpChain {
     };
   }
 
-  private boolean isOn() {
-    return fireplaceModuleService.getState().equals(State.ON);
-  }
-
   private boolean isCorrectDefaultState() {
     return pump.getResponse() != null
-        && ((isOn() && PinState.LOW.equals(pump.getResponse().getPinDefaultState()))
-            || (!isOn() && PinState.HIGH.equals(pump.getResponse().getPinDefaultState())));
+        && ((fireplaceModuleService.isPumpRequired()
+                && PinState.LOW.equals(pump.getResponse().getPinDefaultState()))
+            || (!fireplaceModuleService.isPumpRequired()
+                && PinState.HIGH.equals(pump.getResponse().getPinDefaultState())));
   }
 }
