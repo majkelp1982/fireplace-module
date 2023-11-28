@@ -30,6 +30,7 @@ public class FireplaceModuleParamsService {
                 paramsRepository.saveParams(
                     modelMapper.map(fireplaceModuleParamsDto, FireplaceModuleParamsDao.class),
                     paramTableName))
+        .doOnNext(fireplaceModuleParamsDao -> refreshParams())
         .thenReturn(fireplaceModuleParamsDto);
   }
 
