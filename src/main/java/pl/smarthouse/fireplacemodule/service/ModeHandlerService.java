@@ -1,16 +1,20 @@
 package pl.smarthouse.fireplacemodule.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
 
+@Service
 @RequiredArgsConstructor
+@EnableScheduling
 public class ModeHandlerService {
   private final FireplaceModuleService fireplaceModuleService;
   private final FireplaceModuleParamsService fireplaceModuleParamsService;
 
   @Scheduled(fixedDelay = 10000)
-  void handleMode() {
+  public void handleMode() {
     if (fireplaceModuleService.getWaterInSensor().isError()
         || fireplaceModuleService.getWaterOutSensor().isError()) {
       fireplaceModuleService.setMode(Mode.ERROR);

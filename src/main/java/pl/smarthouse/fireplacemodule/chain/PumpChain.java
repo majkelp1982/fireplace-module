@@ -90,6 +90,8 @@ public class PumpChain {
 
   private Runnable createActionStep3() {
     return () -> {
+      fireplaceModuleService.setPump(
+          pump.getResponse().getPinState().equals(PinState.HIGH) ? State.OFF : State.ON);
       pump.getCommandSet().setCommandType(PinCommandType.NO_ACTION);
     };
   }

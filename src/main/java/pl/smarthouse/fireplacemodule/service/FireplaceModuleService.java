@@ -1,9 +1,13 @@
 package pl.smarthouse.fireplacemodule.service;
 
+import static pl.smarthouse.fireplacemodule.properties.ThrottleProperties.THROTTLE_GOAL_POSITION_CLOSED;
+import static pl.smarthouse.fireplacemodule.properties.ThrottleProperties.THROTTLE_GOAL_POSITION_FULL_OPEN;
+
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.fireplacemodule.configurations.FireplaceModuleConfiguration;
+import pl.smarthouse.fireplacemodule.model.dao.FireplaceModuleDao;
 import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleDto;
 import pl.smarthouse.sharedobjects.dto.fireplace.core.Throttle;
 import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
@@ -22,12 +26,18 @@ public class FireplaceModuleService {
   }
 
   public State stateToggle() {
-    fireplaceModuleConfiguration
-        .getFireplaceModuleDao()
-        .setState(
-            State.ON.equals(fireplaceModuleConfiguration.getFireplaceModuleDao().getState())
-                ? State.OFF
-                : State.ON);
+    final FireplaceModuleDao fireplaceModuleDao =
+        fireplaceModuleConfiguration.getFireplaceModuleDao();
+    fireplaceModuleDao.setState(
+        State.ON.equals(fireplaceModuleConfiguration.getFireplaceModuleDao().getState())
+            ? State.OFF
+            : State.ON);
+    final State currentState = fireplaceModuleConfiguration.getFireplaceModuleDao().getState();
+    if (State.ON.equals(currentState)) {
+      fireplaceModuleDao.getThrottle().setGoalPosition(THROTTLE_GOAL_POSITION_FULL_OPEN);
+    } else {
+      fireplaceModuleDao.getThrottle().setGoalPosition(THROTTLE_GOAL_POSITION_CLOSED);
+    }
     return fireplaceModuleConfiguration.getFireplaceModuleDao().getState();
   }
 
@@ -77,5 +87,9 @@ public class FireplaceModuleService {
 
   public Throttle getThrottle() {
     return fireplaceModuleConfiguration.getFireplaceModuleDao().getThrottle();
+  }
+
+  public void setPump(final State state) {
+    fireplaceModuleConfiguration.getFireplaceModuleDao().setPump(state);
   }
 }

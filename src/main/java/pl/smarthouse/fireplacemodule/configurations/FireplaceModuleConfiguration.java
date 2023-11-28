@@ -37,7 +37,7 @@ public class FireplaceModuleConfiguration {
     fireplaceModuleDao =
         FireplaceModuleDao.builder()
             .moduleName(Esp32ModuleProperties.MODULE_TYPE)
-            .mode(Mode.STANDBY)
+            .mode(Mode.OFF)
             .state(State.OFF)
             .waterIn(new Ds18b20Result())
             .waterOut(new Ds18b20Result())

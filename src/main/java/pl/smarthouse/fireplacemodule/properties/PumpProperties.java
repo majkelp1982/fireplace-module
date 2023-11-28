@@ -7,5 +7,5 @@ public class PumpProperties {
   public static final String PUMP = "pump";
   public static final PinState PUMP_DEFAULT_STATE = PinState.HIGH;
   public static final boolean PUMP_DEFAULT_ENABLED = true;
-  public static final int PUMP_PIN = 17;
+  public static final int PUMP_PIN = 13;
 }

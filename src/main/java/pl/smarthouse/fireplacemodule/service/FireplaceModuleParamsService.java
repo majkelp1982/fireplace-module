@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.fireplacemodule.model.dao.FireplaceModuleParamsDao;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@EnableScheduling
 public class FireplaceModuleParamsService {
   private final ParamsRepository paramsRepository;
   private final FireplaceModuleService fireplaceModuleService;

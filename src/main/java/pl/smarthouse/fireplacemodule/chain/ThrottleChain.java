@@ -2,39 +2,29 @@ package pl.smarthouse.fireplacemodule.chain;
 
 import static pl.smarthouse.fireplacemodule.properties.ThrottleProperties.*;
 
-import java.util.List;
+import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.fireplacemodule.configurations.Esp32ModuleConfig;
-import pl.smarthouse.fireplacemodule.service.DutyCycleService;
-import pl.smarthouse.fireplacemodule.service.FireplaceModuleParamsService;
-import pl.smarthouse.fireplacemodule.service.FireplaceModuleService;
-import pl.smarthouse.sharedobjects.dto.fireplace.core.Throttle;
-import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
+import pl.smarthouse.fireplacemodule.service.ThrottleService;
 import pl.smarthouse.smartchain.model.core.Chain;
 import pl.smarthouse.smartchain.model.core.Step;
 import pl.smarthouse.smartchain.service.ChainService;
 import pl.smarthouse.smartchain.utils.PredicateUtils;
-import pl.smarthouse.smartmodule.model.actors.type.pin.PinCommandType;
+import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685CommandType;
 import pl.smarthouse.smartmodule.model.actors.type.pwm.Pwm;
 import pl.smarthouse.smartmodule.model.actors.type.pwm.PwmCommandType;
 
 @Service
 public class ThrottleChain {
-  private final FireplaceModuleService fireplaceModuleService;
-  private final FireplaceModuleParamsService fireplaceModuleParamsService;
-  private final DutyCycleService dutyCycleService;
+  private final ThrottleService throttleService;
   private final Pwm throttleActor;
 
   public ThrottleChain(
-      @Autowired final FireplaceModuleService fireplaceModuleService,
-      @Autowired final FireplaceModuleParamsService fireplaceModuleParamsService,
-      @Autowired final DutyCycleService dutyCycleService,
+      @Autowired final ThrottleService throttleService,
       @Autowired final ChainService chainService,
       @Autowired final Esp32ModuleConfig esp32ModuleConfig) {
-    this.fireplaceModuleService = fireplaceModuleService;
-    this.fireplaceModuleParamsService = fireplaceModuleParamsService;
-    this.dutyCycleService = dutyCycleService;
+    this.throttleService = throttleService;
     throttleActor = (Pwm) esp32ModuleConfig.getConfiguration().getActorMap().getActor(THROTTLE);
     final Chain chain = createChain();
     chainService.addChain(chain);
@@ -42,91 +32,79 @@ public class ThrottleChain {
 
   private Chain createChain() {
     final Chain chain = new Chain("Throttle");
-    // Wait 1 minute or cooling forced and set throttle position accordingly
+    // Wait for throttles goal position change or 120 seconds and drive to goal position
     chain.addStep(createStep1());
-    // Send new goal value if needed
+    // Wait for response and after set NO_ACTION
     chain.addStep(createStep2());
-    // Wait until response and set NO_ACTION
+    // Wait 1s and release servo motor
     chain.addStep(createStep3());
+    // Wait for response and set NO_ACTION
+    chain.addStep(waitAndSetNoAction());
     return chain;
   }
 
   private Step createStep1() {
-
     return Step.builder()
-        .stepDescription("Calculate goal position")
-        .conditionDescription("Waiting 60 seconds")
-        .condition(PredicateUtils.delaySeconds(60).or(step -> isForceCloseThrottle()))
+        .conditionDescription("Wait for throttles goal position change or 120 seconds")
+        .condition(createConditionStep1().or(PredicateUtils.delaySeconds(120)))
+        .stepDescription("Drive throttle to goal position")
         .action(createActionStep1())
         .build();
   }
 
+  private Predicate<Step> createConditionStep1() {
+    return step -> !throttleService.isPositionCorrect();
+  }
+
   private Runnable createActionStep1() {
     return () -> {
-      int goalPosition = fireplaceModuleService.getThrottle().getCurrentPosition();
-      final double requiredTemp = fireplaceModuleParamsService.getParams().getWorkingTemperature();
-      final double currentTemp = fireplaceModuleService.getWaterOutSensor().getTemp();
-
-      if (currentTemp < requiredTemp) {
-        goalPosition += 10;
-      }
-
-      if (currentTemp > requiredTemp) {
-        goalPosition -= 10;
-      }
-
-      if (goalPosition > 100) {
-        goalPosition = 100;
-      }
-
-      if (goalPosition < 0) {
-        goalPosition = 0;
-      }
-      fireplaceModuleService.getThrottle().setGoalPosition(goalPosition);
+      throttleActor.getCommandSet().setCommandType(PwmCommandType.DUTY_CYCLE);
+      throttleActor
+          .getCommandSet()
+          .setValue(String.valueOf(throttleService.getCalculatedThrottleDutyCycle()));
     };
   }
 
   private Step createStep2() {
     return Step.builder()
-        .stepDescription("Send new goal value if needed")
-        .conditionDescription("No condition")
-        .condition((step -> true))
-        .action(createActionStep2())
+        .conditionDescription("Wait for response")
+        .condition(createConditionStep2())
+        .stepDescription("Set NO_ACTION")
+        .action(setNoAction())
         .build();
   }
 
-  private Runnable createActionStep2() {
-    return () -> {
-      final Throttle throttle = fireplaceModuleService.getThrottle();
-      if (throttle.getCurrentPosition() != throttle.getGoalPosition()) {
-        throttleActor.getCommandSet().setCommandType(PwmCommandType.DUTY_CYCLE);
-        throttleActor
-            .getCommandSet()
-            .setValue(
-                String.valueOf(
-                    dutyCycleService.recalculateByGoalPosition(throttle.getGoalPosition())));
-      }
-    };
+  private Predicate<Step> createConditionStep2() {
+    return PredicateUtils.isResponseUpdated(throttleActor);
   }
 
   private Step createStep3() {
     return Step.builder()
-        .stepDescription("Set NO_ACTION")
-        .conditionDescription("Wait until response updated")
-        .condition(PredicateUtils.isResponseUpdated(throttleActor))
-        .action(createActionStep3())
+        .conditionDescription("Wait 1 seconds")
+        .condition(PredicateUtils.delaySeconds(1))
+        .stepDescription("Write current position and release motor")
+        .action(writeCurrentPositionAndReleaseAllServoMotors())
         .build();
   }
 
-  private Runnable createActionStep3() {
+  private Runnable writeCurrentPositionAndReleaseAllServoMotors() {
     return () -> {
-      throttleActor.getCommandSet().setCommandType(PinCommandType.NO_ACTION);
+      throttleService.setGoalPositionAsCurrent();
+      throttleActor.getCommandSet().setCommandType(PwmCommandType.DUTY_CYCLE);
+      throttleActor.getCommandSet().setValue(Integer.toString(0));
     };
   }
 
-  private boolean isForceCloseThrottle() {
-    final List throttleCloseModes = List.of(Mode.ERROR, Mode.OFF);
-    return throttleCloseModes.contains(fireplaceModuleService.getMode())
-        && fireplaceModuleService.getThrottle().getCurrentPosition() != 0;
+  private Step waitAndSetNoAction() {
+    return Step.builder()
+        .conditionDescription("Wait for response")
+        .condition(PredicateUtils.isResponseUpdated(throttleActor))
+        .stepDescription("Set NO_ACTION")
+        .action(setNoAction())
+        .build();
+  }
+
+  private Runnable setNoAction() {
+    return () -> throttleActor.getCommandSet().setCommandType(Pca9685CommandType.NO_ACTION);
   }
 }
