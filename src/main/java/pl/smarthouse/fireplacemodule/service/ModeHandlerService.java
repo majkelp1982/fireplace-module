@@ -10,6 +10,7 @@ import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
 @RequiredArgsConstructor
 @EnableScheduling
 public class ModeHandlerService {
+  private static final double ALLOWED_DELTA_TEMP = 2.0d;
   private final FireplaceModuleService fireplaceModuleService;
   private final FireplaceModuleParamsService fireplaceModuleParamsService;
 
@@ -47,7 +48,7 @@ public class ModeHandlerService {
     final double deltaTemp =
         fireplaceModuleService.getWaterOutSensor().getTemp()
             - fireplaceModuleService.getWaterInSensor().getTemp();
-    if (deltaTemp > 1.0) {
+    if (deltaTemp > ALLOWED_DELTA_TEMP) {
       fireplaceModuleService.setMode(Mode.COOLING);
     } else {
       fireplaceModuleService.setMode(Mode.OFF);

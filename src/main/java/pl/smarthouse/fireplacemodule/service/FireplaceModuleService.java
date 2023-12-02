@@ -41,14 +41,20 @@ public class FireplaceModuleService {
   }
 
   public void setWaterIn(final Ds18b20Result ds18b20Result) {
+    ds18b20Result.setError(
+        fireplaceModuleConfiguration.getFireplaceModuleDao().getWaterIn().isError());
     fireplaceModuleConfiguration.getFireplaceModuleDao().setWaterIn(ds18b20Result);
   }
 
   public void setWaterOut(final Ds18b20Result ds18b20Result) {
+    ds18b20Result.setError(
+            fireplaceModuleConfiguration.getFireplaceModuleDao().getWaterOut().isError());
     fireplaceModuleConfiguration.getFireplaceModuleDao().setWaterOut(ds18b20Result);
   }
 
   public void setChimney(final Ds18b20Result ds18b20Result) {
+    ds18b20Result.setError(
+            fireplaceModuleConfiguration.getFireplaceModuleDao().getChimney().isError());
     fireplaceModuleConfiguration.getFireplaceModuleDao().setChimney(ds18b20Result);
   }
 
