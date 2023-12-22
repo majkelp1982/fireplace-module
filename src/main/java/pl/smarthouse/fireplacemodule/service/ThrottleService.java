@@ -29,7 +29,7 @@ public class ThrottleService {
     }
 
     if (currentTemp > requiredTemp) {
-      goalPosition -= THROTTLE_GOAL_POSITION_STEP;
+      goalPosition = THROTTLE_GOAL_POSITION_CLOSED;
     }
 
     goalPosition = validateGoalPosition(goalPosition);
