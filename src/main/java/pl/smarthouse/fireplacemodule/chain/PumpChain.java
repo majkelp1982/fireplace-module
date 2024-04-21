@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.fireplacemodule.configurations.Esp32ModuleConfig;
 import pl.smarthouse.fireplacemodule.service.FireplaceModuleService;
-import pl.smarthouse.sharedobjects.dto.fireplace.enums.State;
+import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.smartchain.model.core.Chain;
 import pl.smarthouse.smartchain.model.core.Step;
 import pl.smarthouse.smartchain.service.ChainService;

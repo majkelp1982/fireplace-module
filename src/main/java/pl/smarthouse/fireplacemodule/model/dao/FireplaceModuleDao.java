@@ -3,9 +3,9 @@ package pl.smarthouse.fireplacemodule.model.dao;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import pl.smarthouse.sharedobjects.dao.ModuleDao;
+import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.dto.fireplace.core.Throttle;
 import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
-import pl.smarthouse.sharedobjects.dto.fireplace.enums.State;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Result;
 
 @Data

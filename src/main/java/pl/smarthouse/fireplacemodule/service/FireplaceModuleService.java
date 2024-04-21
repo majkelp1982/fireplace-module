@@ -8,10 +8,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.fireplacemodule.configurations.FireplaceModuleConfiguration;
 import pl.smarthouse.fireplacemodule.model.dao.FireplaceModuleDao;
+import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleDto;
 import pl.smarthouse.sharedobjects.dto.fireplace.core.Throttle;
 import pl.smarthouse.sharedobjects.dto.fireplace.enums.Mode;
-import pl.smarthouse.sharedobjects.dto.fireplace.enums.State;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Result;
 
 @Service

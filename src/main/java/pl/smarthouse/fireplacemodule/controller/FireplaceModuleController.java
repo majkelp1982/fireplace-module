@@ -5,9 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.smarthouse.fireplacemodule.service.FireplaceModuleParamsService;
 import pl.smarthouse.fireplacemodule.service.FireplaceModuleService;
+import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleDto;
 import pl.smarthouse.sharedobjects.dto.fireplace.FireplaceModuleParamsDto;
-import pl.smarthouse.sharedobjects.dto.fireplace.enums.State;
 import reactor.core.publisher.Mono;
 
 @RestController
