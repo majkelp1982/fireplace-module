@@ -36,7 +36,7 @@ public class FireplaceModuleConfiguration {
     throttle.setCurrentPosition(1);
     fireplaceModuleDao =
         FireplaceModuleDao.builder()
-            .moduleName(Esp32ModuleProperties.MODULE_TYPE)
+            .type(Esp32ModuleProperties.MODULE_TYPE)
             .mode(Mode.OFF)
             .state(State.OFF)
             .waterIn(new Ds18b20Result())

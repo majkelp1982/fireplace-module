@@ -59,7 +59,7 @@ public class FireplaceModuleService {
   }
 
   public String getModuleName() {
-    return fireplaceModuleConfiguration.getFireplaceModuleDao().getModuleName();
+    return fireplaceModuleConfiguration.getFireplaceModuleDao().getType();
   }
 
   public Ds18b20Result getWaterInSensor() {
